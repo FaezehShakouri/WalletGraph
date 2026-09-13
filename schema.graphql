@@ -1,0 +1,402 @@
+# WalletGraph 0.1.0 — proposed standard, not an adopted Graph standard.
+# Normative rules, IDs and capability requirements: docs/SPECIFICATION.md.
+# String IDs intentionally support chain-qualified, non-EVM identifiers.
+
+enum LedgerModel { ACCOUNT UTXO HYBRID OTHER }
+enum Visibility { PUBLIC SHIELDED MIXED UNKNOWN }
+enum Availability { AVAILABLE PARTIAL PRIVATE UNSUPPORTED UNKNOWN }
+enum CapabilityKind { ACTIVITY HOLDINGS POSITIONS VALUATION UTXO }
+enum AssetKind { NATIVE FUNGIBLE NON_FUNGIBLE MULTI_TOKEN OTHER }
+enum ExecutionStatus { SUCCESS FAILURE UNKNOWN }
+enum ActivityKind { TRANSFER SWAP DEPOSIT WITHDRAWAL BORROW REPAY LIQUIDATION STAKE UNSTAKE REWARD APPROVAL BRIDGE OTHER UNKNOWN }
+enum ParticipantRole { INITIATOR SENDER RECIPIENT OWNER BENEFICIARY OPERATOR OTHER UNKNOWN }
+enum EffectKind { DEBIT CREDIT FEE MINT BURN }
+enum EndpointKind { ADDRESS SCRIPT SHIELDED UNKNOWN }
+enum BalanceMethod { STATE_READ COMPLETE_REPLAY PARTIAL_REPLAY AUTHORIZED_VIEW UNKNOWN }
+enum PositionKind { LENDING LIQUIDITY VAULT STAKING OTHER }
+enum PositionStatus { OPEN CLOSED UNKNOWN }
+enum ComponentRole { ASSET LIABILITY }
+
+"""One network, not a chain family. Identity follows the declared namespace profile."""
+type Chain @entity(immutable: true) {
+  """CAIP-2 ID where defined; otherwise explicitly namespaced experimental ID."""
+  id: String!
+  """Human-readable network name; never an identity key."""
+  name: String!
+  """CAIP-2 when conforming, otherwise an implementation-owned URI."""
+  identifierStandard: String!
+  """Underlying accounting model; does not imply indexing support."""
+  ledgerModel: LedgerModel!
+}
+
+"""One implementation's dataset. A deployed subgraph has one dataset and one chain."""
+type Dataset @entity(immutable: false) {
+  """Stable implementation-owned URI, not a wallet address."""
+  id: String!
+  """Network indexed by this deployment."""
+  chain: Chain!
+  """Shared schema semantic version."""
+  schemaVersion: String!
+  """Mapping implementation semantic version."""
+  subgraphVersion: String!
+  """Interpretation and accounting methodology semantic version."""
+  methodologyVersion: String!
+  """Public specification of sources, identity normalization and refresh policy."""
+  methodology: String!
+  """Declared capability scopes; absence means unsupported, never complete."""
+  coverage: [Coverage!]! @derivedFrom(field: "dataset")
+}
+
+"""Coverage for one capability and precisely documented source scope."""
+type Coverage @entity(immutable: false) {
+  """Tuple(dataset ID, capability, scope key)."""
+  id: String!
+  """Owning dataset."""
+  dataset: Dataset!
+  """Capability whose completeness is described."""
+  capability: CapabilityKind!
+  """Stable scope key, such as a token identifier or a versioned contract allowlist."""
+  scope: String!
+  """Resolvable documentation enumerating covered sources and exclusions."""
+  scopeDescription: String!
+  """Availability only within this scope, not across the whole chain."""
+  availability: Availability!
+  """Inclusive earliest covered height; null when no interval is claimed."""
+  fromBlock: BigInt
+  """Latest contiguous covered block; null when unknown or unavailable."""
+  throughBlock: Block
+  """Explanation required for any availability other than AVAILABLE."""
+  reason: String
+}
+
+"""An address on one network, not a person, application, or multi-address wallet."""
+type Account @entity(immutable: true) {
+  """Tuple(chain ID, canonical address). See the chain profile; never lowercase all chains."""
+  id: String!
+  """Network on which the address is interpreted."""
+  chain: Chain!
+  """Chain-native canonical address, without an EVM length restriction."""
+  address: String!
+  """Optional CAIP-10 alias only when its syntax and namespace rules are satisfied."""
+  caip10: String
+  """Address encoding profile URI or identifier; required for unambiguous interpretation."""
+  addressFormat: String!
+  """Visibility inherent in this address representation, not a permission grant."""
+  visibility: Visibility!
+  """Current observed holdings, individually timestamped."""
+  holdings: [Holding!]! @derivedFrom(field: "account")
+  """Account-relative activity memberships; paginate this relationship."""
+  activities: [AccountActivity!]! @derivedFrom(field: "account")
+  """Protocol positions attributed by evidence to this address."""
+  positions: [Position!]! @derivedFrom(field: "account")
+}
+
+"""A separately identifiable asset; native coins need no contract address."""
+type Asset @entity(immutable: false) {
+  """Tuple(chain ID, asset namespace, asset reference, token ID or empty string)."""
+  id: String!
+  """Network where this asset exists; bridges do not merge asset identities."""
+  chain: Chain!
+  """Identity namespace, e.g. native, erc20, erc721; documented by profile."""
+  namespace: String!
+  """Canonical contract, mint, denomination, or native-asset reference."""
+  reference: String!
+  """Individual NFT or multi-token ID; null for native/fungible assets."""
+  tokenId: String
+  """Optional conforming CAIP-19 alias; not fabricated for unsupported namespaces."""
+  caip19: String
+  """Asset class; does not establish legitimacy or market value."""
+  kind: AssetKind!
+  """Display metadata, null when unknown. Never default decimals to 18."""
+  decimals: Int
+  """Untrusted display name, null when unavailable."""
+  name: String
+  """Untrusted ticker, not an identity key."""
+  symbol: String
+}
+
+"""An observed included block; orphaned data must be rolled back by the provider."""
+type Block @entity(immutable: true) {
+  """Tuple(chain ID, canonical block hash)."""
+  id: String!
+  """Network containing this block."""
+  chain: Chain!
+  """Chain-native hash encoding, not assumed to be EVM hex."""
+  hash: String!
+  """Chain-native block height or slot under the documented profile."""
+  number: BigInt!
+  """Unix seconds, null if the chain source supplies no reliable timestamp."""
+  timestamp: BigInt
+}
+
+"""Included transaction. No universal single sender/recipient assumption."""
+type Transaction @entity(immutable: true) {
+  """Tuple(chain ID, transaction hash)."""
+  id: String!
+  """Block containing the observed transaction."""
+  block: Block!
+  """Chain-native transaction hash or signature encoding."""
+  hash: String!
+  """Zero-based block position, null if unavailable."""
+  index: BigInt
+  """Execution result; UNKNOWN if the source does not establish it."""
+  status: ExecutionStatus!
+  """Actions interpreted within this transaction, not necessarily one action."""
+  activities: [Activity!]! @derivedFrom(field: "transaction")
+  """Optional UTXO transaction inputs."""
+  inputs: [TransactionInput!]! @derivedFrom(field: "transaction")
+  """Optional UTXO transaction outputs."""
+  outputs: [TransactionOutput!]! @derivedFrom(field: "transaction")
+}
+
+"""An interpreted action within one included transaction, not a wallet-specific copy."""
+type Activity @entity(immutable: true) {
+  """Tuple(transaction ID, stable adapter source locator)."""
+  id: String!
+  """Evidence-bearing transaction."""
+  transaction: Transaction!
+  """ACTIVITY coverage and methodology responsible for this interpretation."""
+  coverage: Coverage!
+  """Normalized action classification."""
+  kind: ActivityKind!
+  """Namespaced extension name only for OTHER, e.g. example.org/action/restake."""
+  customKind: String
+  """Action outcome, which may differ from outer transaction success."""
+  status: ExecutionStatus!
+  """Protocol when known; null for native transfers or unattributed activity."""
+  protocol: Protocol
+  """Stable log/instruction/trace locator; never query-order or wall-clock based."""
+  sourceLocator: String!
+  """Unix seconds copied from the source block, null if unavailable."""
+  timestamp: BigInt
+  """Sortable ASCII key defined in the specification for deterministic pagination."""
+  sortKey: String!
+  """One membership per known account, with separate role records."""
+  accounts: [AccountActivity!]! @derivedFrom(field: "activity")
+  """Observed address-relative effects; not necessarily balanced when coverage is partial."""
+  effects: [AssetEffect!]! @derivedFrom(field: "activity")
+}
+
+"""One address's membership in an activity, enabling a non-duplicated activity feed."""
+type AccountActivity @entity(immutable: true) {
+  """Tuple(account ID, activity ID)."""
+  id: String!
+  """Address involved; never inferred to be a person."""
+  account: Account!
+  """Action in which the address participated."""
+  activity: Activity!
+  """Exact copy of activity.sortKey for stable account-feed pagination."""
+  sortKey: String!
+  """An address can be both sender and recipient without duplicate feed entries."""
+  roles: [ActivityRole!]! @derivedFrom(field: "membership")
+}
+
+"""One evidenced role for an account in an action."""
+type ActivityRole @entity(immutable: true) {
+  """Tuple(membership ID, role)."""
+  id: String!
+  """Account/activity pair."""
+  membership: AccountActivity!
+  """Role established by source semantics, not automatically transaction.from."""
+  role: ParticipantRole!
+}
+
+"""One observed effect on one address. Debit/credit pairing is not presumed."""
+type AssetEffect @entity(immutable: true) {
+  """Tuple(activity ID, effect source locator, account ID, effect kind)."""
+  id: String!
+  """One canonical action assignment; do not re-emit the same effect for a summary action."""
+  activity: Activity!
+  """Affected address on the same chain as the transaction."""
+  account: Account!
+  """Asset whose quantity changes."""
+  asset: Asset!
+  """Direction: DEBIT/FEE/BURN subtract; CREDIT/MINT add."""
+  kind: EffectKind!
+  """Nonnegative integer in asset base units; never a floating-point number."""
+  amount: BigInt!
+  """Stable evidence locator identifying the particular effect."""
+  sourceLocator: String!
+}
+
+"""Latest balance observation for an account/asset in one dataset."""
+type Holding @entity(immutable: false) {
+  """Tuple(dataset ID, account ID, asset ID)."""
+  id: String!
+  """Owner address."""
+  account: Account!
+  """Asset held."""
+  asset: Asset!
+  """HOLDINGS source scope."""
+  coverage: Coverage!
+  """Latest observation; no implication of being current at chain head."""
+  latest: BalanceObservation!
+  """Historical observations; missing intervals are not zero balances."""
+  observations: [BalanceObservation!]! @derivedFrom(field: "holding")
+}
+
+"""Balance at a specified block, with explicit epistemic status."""
+type BalanceObservation @entity(immutable: true) {
+  """Tuple(holding ID, block ID); one end-of-block observation."""
+  id: String!
+  """Account/asset pair being observed."""
+  holding: Holding!
+  """State block of this observation, not the time an HTTP request was made."""
+  block: Block!
+  """AVAILABLE means exact under method; PARTIAL is an estimate, not a complete balance."""
+  availability: Availability!
+  """Nonnegative base units; null if private, unsupported, or unknown."""
+  amount: BigInt
+  """How the quantity was obtained; partial transfer replay cannot establish an exact balance."""
+  method: BalanceMethod!
+  """Required when not AVAILABLE; describes missing history, privacy, or estimation."""
+  reason: String
+}
+
+"""Protocol deployment identity; optional portfolio/activity context."""
+type Protocol @entity(immutable: true) {
+  """Tuple(chain ID, implementation-qualified protocol deployment key)."""
+  id: String!
+  """Network of this deployment."""
+  chain: Chain!
+  """Human-readable protocol and deployment version."""
+  name: String!
+}
+
+"""An evidenced address-owned protocol position, possibly with several assets and debts."""
+type Position @entity(immutable: false) {
+  """Tuple(dataset ID, account ID, protocol ID, source position key)."""
+  id: String!
+  """Evidenced owner or beneficiary; not an inferred wallet cluster."""
+  account: Account!
+  """Protocol deployment maintaining this position."""
+  protocol: Protocol!
+  """POSITIONS coverage scope."""
+  coverage: Coverage!
+  """Stable protocol-native position identifier or market/owner key."""
+  sourceKey: String!
+  """Normalized category; custom details belong in a namespaced extension entity."""
+  kind: PositionKind!
+  """Observed lifecycle state, not inferred from missing records."""
+  status: PositionStatus!
+  """State block shared by all current components."""
+  observedAt: Block!
+  """True only when all economic components at observedAt are represented."""
+  componentsComplete: Boolean!
+  """Latest components; adapters replace/remove stale components atomically."""
+  components: [PositionComponent!]! @derivedFrom(field: "position")
+}
+
+"""One asset claim or liability in a position; quantity is never a USD value."""
+type PositionComponent @entity(immutable: false) {
+  """Tuple(position ID, stable component key)."""
+  id: String!
+  """Position owning this component."""
+  position: Position!
+  """Underlying asset or liability denomination."""
+  asset: Asset!
+  """ASSET contributes positively; LIABILITY negatively when valued."""
+  role: ComponentRole!
+  """Availability of this component quantity."""
+  availability: Availability!
+  """Nonnegative asset base units, null when unavailable."""
+  amount: BigInt
+  """Required explanation for unavailable/partial quantities."""
+  reason: String
+}
+
+"""Optional valuation of an explicitly bounded portfolio at one state block."""
+type PortfolioValuation @entity(immutable: true) {
+  """Tuple(dataset ID, account ID, block ID, valuation methodology version)."""
+  id: String!
+  """Address being valued."""
+  account: Account!
+  """VALUATION scope; must document disjoint holdings/positions selection and price sources."""
+  coverage: Coverage!
+  """Common portfolio state block; do not silently mix balance blocks."""
+  block: Block!
+  """Valuation-specific method version, including receipt-token exclusion rules."""
+  methodologyVersion: String!
+  """AVAILABLE only for a fully quantified and priced declared scope."""
+  availability: Availability!
+  """Nonnegative USD value of selected, priced assets only; null if none can be valued."""
+  pricedAssetsUSD: BigDecimal
+  """Nonnegative USD value of selected, priced liabilities only."""
+  pricedLiabilitiesUSD: BigDecimal
+  """Assets minus liabilities; null unless the declared scope is fully valued."""
+  netValueUSD: BigDecimal
+  """Count of selected exposures missing quantity or price, including liabilities."""
+  unpricedCount: BigInt!
+  """Disjoint economic exposures selected by the methodology, including unpriced ones."""
+  items: [ValuationItem!]! @derivedFrom(field: "valuation")
+  """Required explanation when PARTIAL, PRIVATE, UNSUPPORTED or UNKNOWN."""
+  reason: String
+}
+
+"""Auditable valuation input. Snapshot quantities never depend on future mutable position state."""
+type ValuationItem @entity(immutable: true) {
+  """Tuple(valuation ID, stable economic exposure key)."""
+  id: String!
+  """Portfolio valuation using this exposure."""
+  valuation: PortfolioValuation!
+  """Asset being priced."""
+  asset: Asset!
+  """Asset or liability accounting sign."""
+  role: ComponentRole!
+  """Unique economic exposure key under the documented methodology; receipt and underlying share a key."""
+  exposureKey: String!
+  """Source record ID or public evidence locator; never a credential."""
+  source: String!
+  """Snapshot quantity in base units at valuation.block, null if unknown."""
+  amount: BigInt
+  """Decimal scale used for this valuation, copied rather than read from future metadata."""
+  decimals: Int
+  """USD per whole asset unit, null if unpriced."""
+  priceUSD: BigDecimal
+  """Price source identifier, required when priceUSD is present."""
+  priceSource: String
+  """Unix seconds of the price observation, required when priceUSD is present."""
+  priceTimestamp: BigInt
+  """amount * priceUSD / 10^decimals, rounded to 18 decimal places, half up."""
+  valueUSD: BigDecimal
+}
+
+"""An output in an unspent-transaction-output ledger; an address is not always recoverable."""
+type TransactionOutput @entity(immutable: true) {
+  """Tuple(transaction ID, zero-based output index)."""
+  id: String!
+  """Creating transaction."""
+  transaction: Transaction!
+  """Zero-based output index."""
+  index: BigInt!
+  """Output denomination."""
+  asset: Asset!
+  """Nonnegative base units, null when shielded or otherwise unavailable."""
+  amount: BigInt
+  """What is known about the output destination."""
+  endpointKind: EndpointKind!
+  """Present only when source decoding establishes one destination address."""
+  account: Account
+  """Public locking script encoding if provided; not a fabricated address."""
+  script: String
+  """Spends referencing this output; at most one on the canonical chain."""
+  spends: [TransactionInput!]! @derivedFrom(field: "previousOutput")
+}
+
+"""An input spending an earlier output. No inferred input-to-recipient pairing."""
+type TransactionInput @entity(immutable: true) {
+  """Tuple(transaction ID, zero-based input index)."""
+  id: String!
+  """Spending transaction."""
+  transaction: Transaction!
+  """Zero-based input index."""
+  index: BigInt!
+  """True for a coinbase input; no previous outpoint exists in that case."""
+  coinbase: Boolean!
+  """Referenced transaction hash, retained even when earlier output was not indexed."""
+  previousTransactionHash: String
+  """Referenced output index, null only for coinbase."""
+  previousOutputIndex: BigInt
+  """Resolved output when in coverage; null does not mean zero value."""
+  previousOutput: TransactionOutput
+}
