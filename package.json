@@ -1,0 +1,42 @@
+{
+  "name": "wallet-graph",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node query-standard-subgraphs.js",
+    "validate:schema": "node scripts/validate-schema.mjs",
+    "validate:fixtures": "node scripts/validate-fixtures.mjs",
+    "test": "node --test test/*.test.mjs",
+    "check": "npm run validate:schema && npm run validate:generated && npm test",
+    "validate:generated": "node node_modules/assemblyscript/bin/asc generated/schema.ts --lib node_modules --noEmit --runtime stub"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "0.98.1",
+    "chalk": "4.1.2",
+    "messari-subgraph-cli": "0.2.11"
+  },
+  "overrides": {
+    "@tootallnate/once": "3.0.1",
+    "apisauce": "3.2.2",
+    "axios": "1.20.0",
+    "braces": "3.0.3",
+    "cross-spawn": "7.0.6",
+    "decode-uri-component": "0.5.0",
+    "decompress": "npm:@xhmikosr/decompress@11.1.4",
+    "ejs": "3.1.10",
+    "glob": "11.1.0",
+    "http-proxy-agent": "7.0.2",
+    "immutable": "5.1.9",
+    "js-yaml": "4.3.2",
+    "micromatch": "4.0.8",
+    "semver": "7.8.5",
+    "stream-json": "3.6.0",
+    "undici": "7.29.1",
+    "uuid": "11.1.1",
+    "yaml": "2.9.0"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-ts": "^0.38.2",
+    "mustache": "^4.2.0"
+  }
+}
