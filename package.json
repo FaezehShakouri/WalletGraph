@@ -6,14 +6,23 @@
     "start": "node query-standard-subgraphs.js",
     "validate:schema": "node scripts/validate-schema.mjs",
     "validate:fixtures": "node scripts/validate-fixtures.mjs",
-    "test": "node --test test/*.test.mjs",
-    "check": "npm run validate:schema && npm run validate:generated && npm test",
-    "validate:generated": "node node_modules/assemblyscript/bin/asc generated/schema.ts --lib node_modules --noEmit --runtime stub"
+    "test": "node --test test/*.test.mjs test/evm/*.test.mjs",
+    "check": "npm run validate:schema && npm run validate:generated && npm run build:adapter && npm test",
+    "validate:generated": "node node_modules/assemblyscript/bin/asc generated/schema.ts --lib node_modules --noEmit --runtime stub",
+    "build:adapter": "node scripts/live/build.mjs",
+    "capture:live": "node scripts/live/capture.mjs",
+    "configure:adapter": "node scripts/live/manifests.mjs",
+    "deploy": "node scripts/live/deploy.mjs",
+    "query:wallet": "node scripts/live/query.mjs",
+    "verify:live": "node scripts/live/verify-deployment.mjs"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "0.98.1",
     "chalk": "4.1.2",
-    "messari-subgraph-cli": "0.2.11"
+    "ethereum-cryptography": "2.2.1",
+    "graphql": "16.11.0",
+    "messari-subgraph-cli": "0.2.11",
+    "yaml": "2.9.0"
   },
   "overrides": {
     "@tootallnate/once": "3.0.1",
@@ -38,5 +47,8 @@
   "dependencies": {
     "@graphprotocol/graph-ts": "^0.38.2",
     "mustache": "^4.2.0"
+  },
+  "engines": {
+    "node": ">=24"
   }
 }
