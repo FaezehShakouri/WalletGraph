@@ -1,0 +1,33 @@
+import './env.mjs';
+import { readFile, mkdir, writeFile } from 'node:fs/promises';
+import { inspectAddress } from './query.mjs';
+import { rpc } from './rpc.mjs';
+import { networks } from './networks.mjs';
+import { tuple } from '../ids.mjs';
+const name = process.argv[2], network = networks[name];
+if (!network) throw new Error('Usage: npm run verify:live -- ethereum|base');
+const url = process.env[`${name.toUpperCase()}_SUBGRAPH_URL`];
+if (!url) throw new Error(`Set ${name.toUpperCase()}_SUBGRAPH_URL; live verification cannot use fixture fallback`);
+const evidence = JSON.parse(await readFile(`test/evm/evidence/${name}.json`,'utf8'));
+const address = `0x${evidence.event.topics[1].slice(-40)}`;
+const result = await inspectAddress(name,address,url);
+if (BigInt(result.anchor.number) < BigInt(evidence.block.number)) throw new Error('Subgraph has not reached the evidence block yet');
+const activity = result.activities.find(a => a.activity.transaction.hash === evidence.event.transactionHash && a.activity.sourceLocator === `log:${BigInt(evidence.event.logIndex)}`);
+if (!activity) throw new Error('Captured source activity absent from Graph provider');
+const effect = result.effects.find(e => e.activity.id === activity.activity.id && ['DEBIT','BURN'].includes(e.kind));
+if (!effect || effect.amount !== BigInt(evidence.event.data).toString()) throw new Error('Graph-provider amount disagrees with source log');
+const holding = result.holdings.find(h => h.asset.id === tuple(network.chainId,'erc20',network.token,''));
+if (!holding || holding.latest.availability !== 'AVAILABLE') throw new Error('No exact USDC balance observation to verify');
+const endpoint = process.env[network.rpcEnv] || network.publicRpc;
+if (await rpc(endpoint,'eth_chainId') !== network.rpcChainId) throw new Error('Wrong RPC network');
+const at = `0x${BigInt(holding.latest.block.number).toString(16)}`;
+const block = await rpc(endpoint,'eth_getBlockByNumber',[at,false]);
+if (block.hash !== holding.latest.block.hash) throw new Error('RPC and Graph block hashes disagree');
+const balance = await rpc(endpoint,'eth_call',[{to:network.token,data:`0x70a08231${address.slice(2).padStart(64,'0')}`},at]);
+if (BigInt(balance).toString() !== holding.latest.amount) throw new Error('Graph balance disagrees with block-pinned RPC state');
+const report={verifiedAt:new Date().toISOString(),network:name,chainId:network.chainId,graphBlock:result.anchor,
+  sourceTransaction:evidence.event.transactionHash,balanceBlock:holding.latest.block,checks:['Graph live query','captured transfer amount','RPC block hash','RPC balanceOf'],
+  limitations:['Bounded USDC coverage only','Does not certify full chain completeness or live reorg behavior']};
+await mkdir('artifacts',{recursive:true});
+await writeFile(`artifacts/live-verification-${name}.json`,JSON.stringify(report,null,2)+'\n');
+console.log(JSON.stringify(report,null,2));

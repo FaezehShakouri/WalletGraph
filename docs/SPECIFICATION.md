@@ -18,7 +18,8 @@ there is no custom `Query`, HTTP resolver, or cross-chain discovery service in t
 One reference deployment MUST represent one Dataset on one Chain. Multiple deployments
 can use the same schema; a separate consumer can federate their responses. Non-EVM
 schema representation does not establish that The Graph can ingest that network.
-No live chain adapter or deployment is included in this release.
+The USDC reference adapter now implements Ethereum/Base ingestion; see
+REFERENCE-ADAPTER.md. A provider deployment has not yet been verified.
 
 ## Consumer questions
 

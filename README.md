@@ -19,7 +19,7 @@ npm run check
 
 Uses the already installed Graph CLI and Node test runner. `check` validates the schema
 with The Graph's validator, generates and compiles AssemblyScript entity classes into `generated/`,
-and runs semantic positive/negative tests. No API key or network is needed. The CLI
+and runs schema, compiled-mapping and query-client tests. No API key or network is needed. The CLI
 version is pinned in package.json; validation uses its internal module API, so upgrades
 must be reviewed. `npm run validate:fixtures -- path/to/records.json` checks a dataset
 export against the same subset of executable conformance rules. JSON format is an
@@ -38,12 +38,23 @@ query existing DeFi subgraphs and are not WalletGraph's reference implementation
 
 ## What remains for a live hackathon submission
 
-This package is the **schema deliverable**, not a deployed indexer. Next implement
-at least one chain adapter and demonstrate schema reuse with another source; validate
-real address decoding, evidence attribution and fork handling, deploy to a Graph
-provider, then run the unchanged queries against live data. A multi-chain service
-would combine separate deployments. Public subgraphs must never publish viewing keys
-or decrypted private wallet history.
+The schema now has a [USDC reference adapter](docs/REFERENCE-ADAPTER.md) for Ethereum
+and Base. Both Graph subgraphs compile; the production mapping is tested against
+captured live RPC events and balances. The same query client serves both networks.
+
+```sh
+npm run build:adapter
+# Configure ignored .env from .env.example, then:
+npm run deploy -- ethereum
+npm run deploy -- base
+npm run verify:live -- ethereum
+npm run verify:live -- base
+```
+
+**Still pending:** Studio credentials/slugs, provider deployment and live Graph-query
+verification, actual Graph Node fork testing, your repository push, and the
+[demo recording](docs/DEMO.md). Captured RPC evidence is not a live Graph-provider
+integration. Bitcoin/Zcash examples remain schema fixtures, not live adapters.
 
 The Graph's [ETHOnline standardized-products prize](https://ethglobal.com/events/ethonline2026/prizes/the-graph)
 requires live provider data, meaningful standardization, a public repository and a
