@@ -1,0 +1,105 @@
+{
+  "Chain": [
+    {
+      "id": "eip155:1",
+      "name": "Synthetic example",
+      "identifierStandard": "CAIP-2",
+      "ledgerModel": "ACCOUNT"
+    }
+  ],
+  "Dataset": [
+    {
+      "id": "https://example.org/dataset",
+      "chain": "eip155:1",
+      "schemaVersion": "0.1.0",
+      "subgraphVersion": "0.1.0",
+      "methodologyVersion": "0.1.0",
+      "methodology": "https://example.org/method"
+    }
+  ],
+  "Block": [
+    {
+      "id": "8:eip155:19:block-100",
+      "chain": "eip155:1",
+      "hash": "block-100",
+      "number": "100",
+      "timestamp": "1700000000"
+    }
+  ],
+  "Account": [
+    {
+      "id": "8:eip155:142:0x1111111111111111111111111111111111111111",
+      "chain": "eip155:1",
+      "address": "0x1111111111111111111111111111111111111111",
+      "addressFormat": "account-example",
+      "visibility": "PUBLIC"
+    }
+  ],
+  "Asset": [
+    {
+      "id": "8:eip155:16:native4:coin0:",
+      "chain": "eip155:1",
+      "namespace": "native",
+      "reference": "coin",
+      "kind": "NATIVE",
+      "decimals": 8,
+      "symbol": "TEST"
+    }
+  ],
+  "Coverage": [
+    {
+      "id": "27:https://example.org/dataset9:VALUATION7:fixture",
+      "dataset": "https://example.org/dataset",
+      "capability": "VALUATION",
+      "scope": "fixture",
+      "scopeDescription": "https://example.org/fixture-scope",
+      "availability": "AVAILABLE",
+      "fromBlock": "0",
+      "throughBlock": "8:eip155:19:block-100"
+    }
+  ],
+  "PortfolioValuation": [
+    {
+      "id": "27:https://example.org/dataset55:8:eip155:142:0x111111111111111111111111111111111111111121:8:eip155:19:block-1005:0.1.0",
+      "account": "8:eip155:142:0x1111111111111111111111111111111111111111",
+      "coverage": "27:https://example.org/dataset9:VALUATION7:fixture",
+      "block": "8:eip155:19:block-100",
+      "methodologyVersion": "0.1.0",
+      "availability": "AVAILABLE",
+      "pricedAssetsUSD": "200",
+      "pricedLiabilitiesUSD": "50",
+      "netValueUSD": "150",
+      "unpricedCount": "0"
+    }
+  ],
+  "ValuationItem": [
+    {
+      "id": "119:27:https://example.org/dataset55:8:eip155:142:0x111111111111111111111111111111111111111121:8:eip155:19:block-1005:0.1.07:deposit",
+      "valuation": "27:https://example.org/dataset55:8:eip155:142:0x111111111111111111111111111111111111111121:8:eip155:19:block-1005:0.1.0",
+      "asset": "8:eip155:16:native4:coin0:",
+      "role": "ASSET",
+      "exposureKey": "deposit",
+      "source": "fixture:deposit",
+      "amount": "200000000",
+      "decimals": 8,
+      "priceUSD": "100",
+      "priceSource": "fixture:price",
+      "priceTimestamp": "1700000000",
+      "valueUSD": "200"
+    },
+    {
+      "id": "119:27:https://example.org/dataset55:8:eip155:142:0x111111111111111111111111111111111111111121:8:eip155:19:block-1005:0.1.04:debt",
+      "valuation": "27:https://example.org/dataset55:8:eip155:142:0x111111111111111111111111111111111111111121:8:eip155:19:block-1005:0.1.0",
+      "asset": "8:eip155:16:native4:coin0:",
+      "role": "LIABILITY",
+      "exposureKey": "debt",
+      "source": "fixture:debt",
+      "amount": "50000000",
+      "decimals": 8,
+      "priceUSD": "100",
+      "priceSource": "fixture:price",
+      "priceTimestamp": "1700000000",
+      "valueUSD": "50"
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "Chain": [
+    {
+      "id": "example:zcash",
+      "name": "Synthetic example",
+      "identifierStandard": "https://example.org/experimental-zcash-profile",
+      "ledgerModel": "HYBRID"
+    }
+  ],
+  "Dataset": [
+    {
+      "id": "https://example.org/dataset",
+      "chain": "example:zcash",
+      "schemaVersion": "0.1.0",
+      "subgraphVersion": "0.1.0",
+      "methodologyVersion": "0.1.0",
+      "methodology": "https://example.org/method"
+    }
+  ],
+  "Block": [
+    {
+      "id": "13:example:zcash9:block-100",
+      "chain": "example:zcash",
+      "hash": "block-100",
+      "number": "100",
+      "timestamp": "1700000000"
+    }
+  ],
+  "Account": [
+    {
+      "id": "13:example:zcash181:uaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "chain": "example:zcash",
+      "address": "uaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "addressFormat": "hybrid-example",
+      "visibility": "SHIELDED"
+    }
+  ],
+  "Asset": [
+    {
+      "id": "13:example:zcash6:native4:coin0:",
+      "chain": "example:zcash",
+      "namespace": "native",
+      "reference": "coin",
+      "kind": "NATIVE",
+      "decimals": 8,
+      "symbol": "TEST"
+    }
+  ],
+  "Coverage": [
+    {
+      "id": "27:https://example.org/dataset8:HOLDINGS7:fixture",
+      "dataset": "https://example.org/dataset",
+      "capability": "HOLDINGS",
+      "scope": "fixture",
+      "scopeDescription": "https://example.org/fixture-scope",
+      "availability": "PRIVATE",
+      "fromBlock": null,
+      "throughBlock": null,
+      "reason": "Shielded data cannot be discovered from a public address."
+    }
+  ],
+  "Holding": [
+    {
+      "id": "27:https://example.org/dataset201:13:example:zcash181:uaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa32:13:example:zcash6:native4:coin0:",
+      "account": "13:example:zcash181:uaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "asset": "13:example:zcash6:native4:coin0:",
+      "coverage": "27:https://example.org/dataset8:HOLDINGS7:fixture",
+      "latest": "270:27:https://example.org/dataset201:13:example:zcash181:uaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa32:13:example:zcash6:native4:coin0:27:13:example:zcash9:block-100"
+    }
+  ],
+  "BalanceObservation": [
+    {
+      "id": "270:27:https://example.org/dataset201:13:example:zcash181:uaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa32:13:example:zcash6:native4:coin0:27:13:example:zcash9:block-100",
+      "holding": "27:https://example.org/dataset201:13:example:zcash181:uaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa32:13:example:zcash6:native4:coin0:",
+      "block": "13:example:zcash9:block-100",
+      "availability": "PRIVATE",
+      "amount": null,
+      "method": "UNKNOWN",
+      "reason": "Public visibility unavailable."
+    }
+  ]
+}

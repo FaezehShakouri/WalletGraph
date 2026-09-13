@@ -1,0 +1,99 @@
+{
+  "Chain": [
+    {
+      "id": "eip155:1",
+      "name": "Synthetic example",
+      "identifierStandard": "CAIP-2",
+      "ledgerModel": "ACCOUNT"
+    }
+  ],
+  "Dataset": [
+    {
+      "id": "https://example.org/dataset",
+      "chain": "eip155:1",
+      "schemaVersion": "0.1.0",
+      "subgraphVersion": "0.1.0",
+      "methodologyVersion": "0.1.0",
+      "methodology": "https://example.org/method"
+    }
+  ],
+  "Block": [
+    {
+      "id": "8:eip155:19:block-100",
+      "chain": "eip155:1",
+      "hash": "block-100",
+      "number": "100",
+      "timestamp": "1700000000"
+    }
+  ],
+  "Account": [
+    {
+      "id": "8:eip155:142:0x1111111111111111111111111111111111111111",
+      "chain": "eip155:1",
+      "address": "0x1111111111111111111111111111111111111111",
+      "addressFormat": "account-example",
+      "visibility": "PUBLIC"
+    }
+  ],
+  "Asset": [
+    {
+      "id": "8:eip155:16:native4:coin0:",
+      "chain": "eip155:1",
+      "namespace": "native",
+      "reference": "coin",
+      "kind": "NATIVE",
+      "decimals": 8,
+      "symbol": "TEST"
+    }
+  ],
+  "Coverage": [
+    {
+      "id": "27:https://example.org/dataset9:POSITIONS7:fixture",
+      "dataset": "https://example.org/dataset",
+      "capability": "POSITIONS",
+      "scope": "fixture",
+      "scopeDescription": "https://example.org/fixture-scope",
+      "availability": "AVAILABLE",
+      "fromBlock": "0",
+      "throughBlock": "8:eip155:19:block-100"
+    }
+  ],
+  "Protocol": [
+    {
+      "id": "8:eip155:118:example-lending-v1",
+      "chain": "eip155:1",
+      "name": "Example lending"
+    }
+  ],
+  "Position": [
+    {
+      "id": "27:https://example.org/dataset55:8:eip155:142:0x111111111111111111111111111111111111111131:8:eip155:118:example-lending-v18:market-1",
+      "account": "8:eip155:142:0x1111111111111111111111111111111111111111",
+      "protocol": "8:eip155:118:example-lending-v1",
+      "coverage": "27:https://example.org/dataset9:POSITIONS7:fixture",
+      "sourceKey": "market-1",
+      "kind": "LENDING",
+      "status": "OPEN",
+      "observedAt": "8:eip155:19:block-100",
+      "componentsComplete": true
+    }
+  ],
+  "PositionComponent": [
+    {
+      "id": "132:27:https://example.org/dataset55:8:eip155:142:0x111111111111111111111111111111111111111131:8:eip155:118:example-lending-v18:market-15:ASSET",
+      "position": "27:https://example.org/dataset55:8:eip155:142:0x111111111111111111111111111111111111111131:8:eip155:118:example-lending-v18:market-1",
+      "asset": "8:eip155:16:native4:coin0:",
+      "role": "ASSET",
+      "availability": "AVAILABLE",
+      "amount": "200000000"
+    },
+    {
+      "id": "132:27:https://example.org/dataset55:8:eip155:142:0x111111111111111111111111111111111111111131:8:eip155:118:example-lending-v18:market-19:LIABILITY",
+      "position": "27:https://example.org/dataset55:8:eip155:142:0x111111111111111111111111111111111111111131:8:eip155:118:example-lending-v18:market-1",
+      "asset": "8:eip155:16:native4:coin0:",
+      "role": "LIABILITY",
+      "availability": "AVAILABLE",
+      "amount": "50000000"
+    }
+  ]
+}

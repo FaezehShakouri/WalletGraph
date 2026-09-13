@@ -1,0 +1,122 @@
+{
+  "Chain": [
+    {
+      "id": "eip155:1",
+      "name": "Synthetic example",
+      "identifierStandard": "CAIP-2",
+      "ledgerModel": "ACCOUNT"
+    }
+  ],
+  "Dataset": [
+    {
+      "id": "https://example.org/dataset",
+      "chain": "eip155:1",
+      "schemaVersion": "0.1.0",
+      "subgraphVersion": "0.1.0",
+      "methodologyVersion": "0.1.0",
+      "methodology": "https://example.org/method"
+    }
+  ],
+  "Block": [
+    {
+      "id": "8:eip155:19:block-100",
+      "chain": "eip155:1",
+      "hash": "block-100",
+      "number": "100",
+      "timestamp": "1700000000"
+    }
+  ],
+  "Account": [
+    {
+      "id": "8:eip155:142:0x1111111111111111111111111111111111111111",
+      "chain": "eip155:1",
+      "address": "0x1111111111111111111111111111111111111111",
+      "addressFormat": "account-example",
+      "visibility": "PUBLIC"
+    }
+  ],
+  "Asset": [
+    {
+      "id": "8:eip155:16:native4:coin0:",
+      "chain": "eip155:1",
+      "namespace": "native",
+      "reference": "coin",
+      "kind": "NATIVE",
+      "decimals": 8,
+      "symbol": "TEST"
+    }
+  ],
+  "Coverage": [
+    {
+      "id": "27:https://example.org/dataset8:ACTIVITY7:fixture",
+      "dataset": "https://example.org/dataset",
+      "capability": "ACTIVITY",
+      "scope": "fixture",
+      "scopeDescription": "https://example.org/fixture-scope",
+      "availability": "AVAILABLE",
+      "fromBlock": "0",
+      "throughBlock": "8:eip155:19:block-100"
+    }
+  ],
+  "Transaction": [
+    {
+      "id": "8:eip155:14:tx-1",
+      "hash": "tx-1",
+      "block": "8:eip155:19:block-100",
+      "index": "0",
+      "status": "SUCCESS"
+    }
+  ],
+  "Activity": [
+    {
+      "id": "16:8:eip155:14:tx-15:log:0",
+      "transaction": "8:eip155:14:tx-1",
+      "coverage": "27:https://example.org/dataset8:ACTIVITY7:fixture",
+      "kind": "TRANSFER",
+      "status": "SUCCESS",
+      "sourceLocator": "log:0",
+      "timestamp": "1700000000",
+      "sortKey": "0000000000000000000000000000000000000100:0000000000000000000000000000000000000000:31363a383a6569703135353a31343a74782d31353a6c6f673a30"
+    }
+  ],
+  "AccountActivity": [
+    {
+      "id": "55:8:eip155:142:0x111111111111111111111111111111111111111126:16:8:eip155:14:tx-15:log:0",
+      "account": "8:eip155:142:0x1111111111111111111111111111111111111111",
+      "activity": "16:8:eip155:14:tx-15:log:0",
+      "sortKey": "0000000000000000000000000000000000000100:0000000000000000000000000000000000000000:31363a383a6569703135353a31343a74782d31353a6c6f673a30"
+    }
+  ],
+  "ActivityRole": [
+    {
+      "id": "87:55:8:eip155:142:0x111111111111111111111111111111111111111126:16:8:eip155:14:tx-15:log:06:SENDER",
+      "membership": "55:8:eip155:142:0x111111111111111111111111111111111111111126:16:8:eip155:14:tx-15:log:0",
+      "role": "SENDER"
+    },
+    {
+      "id": "87:55:8:eip155:142:0x111111111111111111111111111111111111111126:16:8:eip155:14:tx-15:log:09:RECIPIENT",
+      "membership": "55:8:eip155:142:0x111111111111111111111111111111111111111126:16:8:eip155:14:tx-15:log:0",
+      "role": "RECIPIENT"
+    }
+  ],
+  "AssetEffect": [
+    {
+      "id": "26:16:8:eip155:14:tx-15:log:05:log:055:8:eip155:142:0x11111111111111111111111111111111111111115:DEBIT",
+      "activity": "16:8:eip155:14:tx-15:log:0",
+      "account": "8:eip155:142:0x1111111111111111111111111111111111111111",
+      "asset": "8:eip155:16:native4:coin0:",
+      "kind": "DEBIT",
+      "amount": "9007199254740993000000",
+      "sourceLocator": "log:0"
+    },
+    {
+      "id": "26:16:8:eip155:14:tx-15:log:05:log:055:8:eip155:142:0x11111111111111111111111111111111111111116:CREDIT",
+      "activity": "16:8:eip155:14:tx-15:log:0",
+      "account": "8:eip155:142:0x1111111111111111111111111111111111111111",
+      "asset": "8:eip155:16:native4:coin0:",
+      "kind": "CREDIT",
+      "amount": "9007199254740993000000",
+      "sourceLocator": "log:0"
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "Chain": [
+    {
+      "id": "bip122:000000000019d6689c085ae165831e93",
+      "name": "Synthetic example",
+      "identifierStandard": "CAIP-2",
+      "ledgerModel": "UTXO"
+    }
+  ],
+  "Dataset": [
+    {
+      "id": "https://example.org/dataset",
+      "chain": "bip122:000000000019d6689c085ae165831e93",
+      "schemaVersion": "0.1.0",
+      "subgraphVersion": "0.1.0",
+      "methodologyVersion": "0.1.0",
+      "methodology": "https://example.org/method"
+    }
+  ],
+  "Block": [
+    {
+      "id": "39:bip122:000000000019d6689c085ae165831e939:block-100",
+      "chain": "bip122:000000000019d6689c085ae165831e93",
+      "hash": "block-100",
+      "number": "100",
+      "timestamp": "1700000000"
+    }
+  ],
+  "Account": [
+    {
+      "id": "39:bip122:000000000019d6689c085ae165831e9334:128Lkh3S7CkDTBZ8W7BbpsN3YYizJMp8p6",
+      "chain": "bip122:000000000019d6689c085ae165831e93",
+      "address": "128Lkh3S7CkDTBZ8W7BbpsN3YYizJMp8p6",
+      "addressFormat": "utxo-example",
+      "visibility": "PUBLIC"
+    }
+  ],
+  "Asset": [
+    {
+      "id": "39:bip122:000000000019d6689c085ae165831e936:native4:coin0:",
+      "chain": "bip122:000000000019d6689c085ae165831e93",
+      "namespace": "native",
+      "reference": "coin",
+      "kind": "NATIVE",
+      "decimals": 8,
+      "symbol": "TEST"
+    }
+  ],
+  "Coverage": [
+    {
+      "id": "27:https://example.org/dataset4:UTXO7:fixture",
+      "dataset": "https://example.org/dataset",
+      "capability": "UTXO",
+      "scope": "fixture",
+      "scopeDescription": "https://example.org/fixture-scope",
+      "availability": "AVAILABLE",
+      "fromBlock": "0",
+      "throughBlock": "39:bip122:000000000019d6689c085ae165831e939:block-100"
+    }
+  ],
+  "Transaction": [
+    {
+      "id": "39:bip122:000000000019d6689c085ae165831e935:prior",
+      "block": "39:bip122:000000000019d6689c085ae165831e939:block-100",
+      "hash": "prior",
+      "index": "0",
+      "status": "SUCCESS"
+    },
+    {
+      "id": "39:bip122:000000000019d6689c085ae165831e935:spend",
+      "block": "39:bip122:000000000019d6689c085ae165831e939:block-100",
+      "hash": "spend",
+      "index": "1",
+      "status": "SUCCESS"
+    }
+  ],
+  "TransactionOutput": [
+    {
+      "id": "49:39:bip122:000000000019d6689c085ae165831e935:prior1:0",
+      "transaction": "39:bip122:000000000019d6689c085ae165831e935:prior",
+      "index": "0",
+      "asset": "39:bip122:000000000019d6689c085ae165831e936:native4:coin0:",
+      "amount": "20000",
+      "endpointKind": "ADDRESS",
+      "account": "39:bip122:000000000019d6689c085ae165831e9334:128Lkh3S7CkDTBZ8W7BbpsN3YYizJMp8p6"
+    },
+    {
+      "id": "49:39:bip122:000000000019d6689c085ae165831e935:prior1:1",
+      "transaction": "39:bip122:000000000019d6689c085ae165831e935:prior",
+      "index": "1",
+      "asset": "39:bip122:000000000019d6689c085ae165831e936:native4:coin0:",
+      "amount": "20000",
+      "endpointKind": "ADDRESS",
+      "account": "39:bip122:000000000019d6689c085ae165831e9334:128Lkh3S7CkDTBZ8W7BbpsN3YYizJMp8p6"
+    },
+    {
+      "id": "49:39:bip122:000000000019d6689c085ae165831e935:spend1:0",
+      "transaction": "39:bip122:000000000019d6689c085ae165831e935:spend",
+      "index": "0",
+      "asset": "39:bip122:000000000019d6689c085ae165831e936:native4:coin0:",
+      "amount": "39000",
+      "endpointKind": "SCRIPT",
+      "script": "synthetic-locking-script"
+    }
+  ],
+  "TransactionInput": [
+    {
+      "id": "49:39:bip122:000000000019d6689c085ae165831e935:spend1:0",
+      "transaction": "39:bip122:000000000019d6689c085ae165831e935:spend",
+      "index": "0",
+      "coinbase": false,
+      "previousTransactionHash": "prior",
+      "previousOutputIndex": "0",
+      "previousOutput": "49:39:bip122:000000000019d6689c085ae165831e935:prior1:0"
+    },
+    {
+      "id": "49:39:bip122:000000000019d6689c085ae165831e935:spend1:1",
+      "transaction": "39:bip122:000000000019d6689c085ae165831e935:spend",
+      "index": "1",
+      "coinbase": false,
+      "previousTransactionHash": "prior",
+      "previousOutputIndex": "1",
+      "previousOutput": "49:39:bip122:000000000019d6689c085ae165831e935:prior1:1"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+# Use a canonical WalletGraph tuple ID, constructed according to SPECIFICATION.md.
+# Pin all pages of one read to the same indexed block; cursor starts at "".
+query AddressPortfolio($id: ID!, $at: Int!, $first: Int!, $cursor: String!) {
+  account(id: $id, block: { number: $at }) {
+    id
+    address
+    visibility
+    chain { id name ledgerModel }
+    holdings(first: $first, orderBy: id, orderDirection: asc, where: { id_gt: $cursor }) {
+      id
+      asset { id symbol decimals kind }
+      latest { amount availability method reason block { number hash timestamp } }
+    }
+  }
+}
+
+query AddressActivity($account: String!, $at: Int!, $first: Int!, $cursor: String!) {
+  accountActivities(block: { number: $at }, first: $first, orderBy: sortKey,
+    orderDirection: asc, where: { account: $account, sortKey_gt: $cursor }) {
+    id
+    sortKey
+    activity { id kind status timestamp sourceLocator transaction { hash block { number hash } } }
+  }
+}
+
+# Roles/effects can also be large: page them independently, not a silent first-100 list.
+query ActivityEffects($activity: String!, $at: Int!, $first: Int!, $cursor: String!) {
+  assetEffects(block: { number: $at }, first: $first, orderBy: id,
+    orderDirection: asc, where: { activity: $activity, id_gt: $cursor }) {
+    id kind amount account { address } asset { id symbol decimals }
+  }
+}
+
+query Coverage($at: Int!) {
+  datasets(block: { number: $at }, first: 1) {
+    id schemaVersion subgraphVersion methodologyVersion methodology chain { id }
+  }
+}
+# Retrieve Coverage entities separately with pagination for a full coverage inventory.
+
+query SourceCoverage($at: Int!, $first: Int!, $cursor: String!) {
+  coverages(block: { number: $at }, first: $first, orderBy: id,
+    orderDirection: asc, where: { id_gt: $cursor }) {
+    id capability scope scopeDescription availability reason fromBlock
+    throughBlock { number hash timestamp }
+  }
+}
+
+query AddressPositions($account: String!, $at: Int!, $first: Int!, $cursor: String!) {
+  positions(block: { number: $at }, first: $first, orderBy: id,
+    orderDirection: asc, where: { account: $account, id_gt: $cursor }) {
+    id kind status componentsComplete sourceKey protocol { id name }
+    observedAt { number hash timestamp }
+  }
+}
+
+query PositionComponents($position: String!, $at: Int!, $first: Int!, $cursor: String!) {
+  positionComponents(block: { number: $at }, first: $first, orderBy: id,
+    orderDirection: asc, where: { position: $position, id_gt: $cursor }) {
+    id role amount availability reason asset { id symbol decimals }
+  }
+}
+
+query MembershipRoles($membership: String!, $at: Int!, $first: Int!, $cursor: String!) {
+  activityRoles(block: { number: $at }, first: $first, orderBy: id,
+    orderDirection: asc, where: { membership: $membership, id_gt: $cursor }) {
+    id role
+  }
+}
